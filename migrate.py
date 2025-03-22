@@ -8,12 +8,12 @@ import argparse
 # Configuration
 parser = argparse.ArgumentParser(description="Migrate Amplitude Analytics Data")
 parser.add_argument("--api-key", required=True, help="Amplitude API Key")
-parser.add_argument("--zip-file-path", required=True, help="Path to the export.zip file")
+parser.add_argument("--zip-file", required=True, help="Path to the export.zip file")
 args = parser.parse_args()
 
 API_KEY = args.api_key
+ZIP_FILE_PATH = args.zip_file
 AMPLITUDE_ENDPOINT = os.getenv("AMPLITUDE_ENDPOINT", "https://api2.amplitude.com/2/httpapi")
-ZIP_FILE_PATH = args.zip_file_path
 EXTRACTED_FOLDER = os.getenv("EXTRACTED_FOLDER", "extracted_events")
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", 100))  # Amplitude recommends sending 10-1000 events per request
 
