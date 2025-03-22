@@ -13,7 +13,8 @@ args = parser.parse_args()
 
 API_KEY = args.api_key
 ZIP_FILE_PATH = args.zip_file
-AMPLITUDE_ENDPOINT = os.getenv("AMPLITUDE_ENDPOINT", "https://api2.amplitude.com/2/httpapi")
+PRIMARY_ENDPOINT = os.getenv("AMPLITUDE_ENDPOINT", "https://api2.amplitude.com/2/httpapi")
+SECONDARY_ENDPOINT = "https://api.eu.amplitude.com/2/httpapi"
 EXTRACTED_FOLDER = os.getenv("EXTRACTED_FOLDER", "extracted_events")
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", 100))  # Amplitude recommends sending 10-1000 events per request
 
@@ -48,11 +49,17 @@ def load_events_from_folder(folder):
 # Step 3: Send data to Amplitude
 def send_events(events):
     payload = {"api_key": API_KEY, "events": events}
-    response = requests.post(AMPLITUDE_ENDPOINT, json=payload)
+    response = requests.post(PRIMARY_ENDPOINT, json=payload)
     if response.status_code == 200:
-        print(f"Successfully sent {len(events)} events.")
+        print(f"Successfully sent {len(events)} events to primary endpoint.")
     else:
-        print(f"Failed to send events. Response: {response.text}")
+        print(f"Failed to send events to primary endpoint. Response: {response.text}")
+        print(f"Trying secondary endpoint.")
+        response = requests.post(SECONDARY_ENDPOINT, json=payload)
+        if response.status_code == 200:
+            print(f"Successfully sent {len(events)} events to secondary endpoint.")
+        else:
+            print(f"Failed to send events to secondary endpoint. Response: {response.text}")
 
 # Main execution
 if __name__ == "__main__":
